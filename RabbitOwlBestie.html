@@ -1,0 +1,156 @@
+from pathlib import Path
+
+html = r"""<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Owl Surprise For Rabbit</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0;font-family:-apple-system,BlinkMacSystemFont,sans-serif}
+body{background:linear-gradient(135deg,#ffd6e7,#ffeecf);overflow:hidden}
+.page{display:none;height:100dvh;padding:20px;justify-content:center;align-items:center;flex-direction:column;text-align:center}
+.active{display:flex}
+.card{background:rgba(255,255,255,.85);padding:24px;border-radius:24px;max-width:700px;width:100%;box-shadow:0 10px 30px rgba(0,0,0,.12)}
+h1{margin-bottom:12px} p{margin:10px 0;line-height:1.5}
+button{padding:14px 22px;border:none;border-radius:999px;margin:8px;background:#fff;cursor:pointer}
+.answers button{display:block;width:100%}
+.sticker{position:fixed;font-size:2rem;animation:float 12s linear infinite}
+@keyframes float{from{transform:translateY(110vh)}to{transform:translateY(-120vh)}}
+.gallery img{width:90px;height:90px;object-fit:cover;border-radius:14px;margin:4px}
+#confetti{position:fixed;inset:0;pointer-events:none}
+</style>
+</head>
+<body>
+<canvas id="confetti"></canvas>
+
+<div class="sticker" style="left:5%">🐱</div>
+<div class="sticker" style="left:25%">🦉</div>
+<div class="sticker" style="left:50%">🐰</div>
+<div class="sticker" style="left:75%">🐱</div>
+
+<div class="page active" id="p1"><div class="card">
+<h1>🦉 Welcome Rabbit!</h1>
+<p>Welcome to Owl's Secret Surprise Headquarters. To reveal the surprise, you must pass 3 friendship verification challenges.</p>
+<p>⚠ Wrong answers may cause emotional damage to Owl.</p>
+<button onclick="showPage(2)">Let's Start 🚀</button>
+</div></div>
+
+<div class="page" id="p2"><div class="card">
+<h1>Question 1</h1>
+<p>When is Owl & Rabbit Bestie Anniversary?</p>
+<div class="answers">
+<button onclick="wrong()">02-02-2025</button>
+<button onclick="wrong()">03-02-2025</button>
+<button onclick="wrong()">04-02-2025</button>
+<button onclick="showPage(3)">05-02-2025 ✅</button>
+</div></div></div>
+
+<div class="page" id="p3"><div class="card">
+<h1>Question 2</h1>
+<p>What does Owl like the most?</p>
+<div class="answers">
+<button onclick="wrong()">Pineapple</button>
+<button onclick="wrong()">Mutton Biryani</button>
+<button onclick="wrong()">Chicken Biryani</button>
+<button onclick="showPage(4)">Mangoes 🥭 ✅</button>
+</div></div></div>
+
+<div class="page" id="p4"><div class="card">
+<h1>🐱 Friendship Analysis</h1>
+<p>Kindness: 100%</p>
+<p>Chaos: 95%</p>
+<p>Food Lover: 100%</p>
+<p>Bestie Power: ∞</p>
+<p>Cat Council Verdict: Certified Good Human™</p>
+<button onclick="showPage(5)">Continue</button>
+</div></div>
+
+<div class="page" id="p5"><div class="card">
+<h1>Question 3</h1>
+<p>What was the first movie Rabbit went with Owl?</p>
+<div class="answers">
+<button onclick="showPage(6)">From the World of John Wick: Ballerina ✅</button>
+<button onclick="wrong()">Wicked for Good</button>
+<button onclick="wrong()">Scream 7</button>
+<button onclick="wrong()">Mission Impossible</button>
+</div></div></div>
+
+<div class="page" id="p6"><div class="card">
+<h1>❤️ Message From Owl</h1>
+<p>Hey bestieee ❤️🥹</p>
+<p>Before revealing the surprise, there’s something I genuinely wanted to say.</p>
+<p>I know my Rabbit is probably still upset with Owl, and honestly, I completely understand why.</p>
+<p>One thing that keeps bothering me is that Owl always said he would protect Rabbit. But when everything happened, I couldn't protect you the way I wanted to, and that's something I still regret a lot.</p>
+<p>When I heard your name came up in the whole situation, I honestly felt really bad. It was never supposed to involve you, and I never expected things to go in that direction.</p>
+<p>No matter how much I joke around, I genuinely value our friendship and I never wanted any negativity to reach you.</p>
+<p>So from Owl to Rabbit...❤️</p>
+<button onclick="showPage(7)">Continue 🥺</button>
+</div></div>
+
+<div class="page" id="p7"><div class="card">
+<h1>🦉 Bestie Date Proposal</h1>
+<p>I dare you to click NO 😏</p>
+<button onclick="showPage(8)">YES ❤️</button>
+<button id="noBtn">NO 😂</button>
+</div></div>
+
+<div class="page" id="p8"><div class="card">
+<h1>Choose Our Adventure</h1>
+<button onclick="showPage(9)">🍿 Movie</button>
+<button onclick="showPage(9)">🍕 Food</button>
+<button onclick="showPage(9)">🛍 Shopping</button>
+<button onclick="showPage(9)">☕ Cafe</button>
+</div></div>
+
+<div class="page" id="p9"><div class="card">
+<h1>🎉 Surprise Unlocked 🎉</h1>
+<div class="gallery">
+<img src="owl.jpg" alt="owl">
+<img src="rabbit.jpg" alt="rabbit">
+<img src="bg1.jpg" alt="memory">
+</div>
+<p>Best Friend Status: VERIFIED ✅</p>
+<p>Rabbit Status: ADORABLE ✅</p>
+<p>Food Lover Status: VERIFIED ✅</p>
+<p>Movie Partner Status: VERIFIED ✅</p>
+<p>Life genuinely became more fun after Rabbit appeared in Owl's story.</p>
+<p>🦉 Owl appreciates Rabbit.</p>
+<p>Mission Complete ❤️</p>
+<button onclick="celebrate()">Finish 🎊</button>
+</div></div>
+
+<script>
+function showPage(n){
+document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
+document.getElementById('p'+n).classList.add('active');
+}
+function wrong(){alert('🐱 Cat Council disapproves. Try again!');}
+
+const noBtn=document.getElementById('noBtn');
+noBtn.addEventListener('mouseover',()=>{
+noBtn.style.position='fixed';
+noBtn.style.left=Math.random()*(window.innerWidth-120)+'px';
+noBtn.style.top=Math.random()*(window.innerHeight-60)+'px';
+});
+
+function celebrate(){
+alert('🐰🦉 Thank you Rabbit!');
+const c=document.getElementById('confetti');
+const ctx=c.getContext('2d');
+c.width=innerWidth;c.height=innerHeight;
+let p=[...Array(120)].map(()=>({x:Math.random()*c.width,y:0,r:10+Math.random()*15,e:['🐰','🦉','🐱','❤️','✨'][Math.floor(Math.random()*5)]}));
+(function a(){
+ctx.clearRect(0,0,c.width,c.height);
+ctx.font='24px serif';
+p.forEach(o=>{o.y+=3;ctx.fillText(o.e,o.x,o.y)});
+requestAnimationFrame(a);
+})();
+}
+</script>
+</body>
+</html>"""
+
+path = "/mnt/data/owl_rabbit_surprise.html"
+Path(path).write_text(html, encoding="utf-8")
+print(path)
