@@ -1,150 +1,449 @@
-html = r"""<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<title>Owl Surprise For Rabbit</title>
-<style>
-*{box-sizing:border-box;margin:0;padding:0;font-family:-apple-system,BlinkMacSystemFont,sans-serif}
-body{background:linear-gradient(135deg,#ffd6e7,#ffeecf);overflow:hidden}
-.page{display:none;height:100dvh;padding:20px;justify-content:center;align-items:center;flex-direction:column;text-align:center}
-.active{display:flex}
-.card{background:rgba(255,255,255,.85);padding:24px;border-radius:24px;max-width:700px;width:100%;box-shadow:0 10px 30px rgba(0,0,0,.12)}
-h1{margin-bottom:12px} p{margin:10px 0;line-height:1.5}
-button{padding:14px 22px;border:none;border-radius:999px;margin:8px;background:#fff;cursor:pointer}
-.answers button{display:block;width:100%}
-.sticker{position:fixed;font-size:2rem;animation:float 12s linear infinite}
-@keyframes float{from{transform:translateY(110vh)}to{transform:translateY(-120vh)}}
-.gallery img{width:90px;height:90px;object-fit:cover;border-radius:14px;margin:4px}
-#confetti{position:fixed;inset:0;pointer-events:none}
-</style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Owl & Rabbit: Mission Complete</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <style>
+        /* 1. CORE DESIGN & RESET */
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Poppins', sans-serif; }
+        
+        body { 
+            background: radial-gradient(circle at top right, #1e293b, #0f172a 60%, #020617); 
+            height: 100vh; 
+            width: 100vw; 
+            overflow: hidden; 
+            color: #f8fafc;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            position: relative;
+        }
+
+        /* Animated Stars Background */
+        body::before {
+            content: '';
+            position: absolute;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background-image: 
+                radial-gradient(2px 2px at 20px 30px, #ffffff, rgba(0,0,0,0)),
+                radial-gradient(2px 2px at 40px 70px, #ffffff, rgba(0,0,0,0)),
+                radial-gradient(2px 2px at 50px 160px, #ffffff, rgba(0,0,0,0)),
+                radial-gradient(2px 2px at 90px 40px, #ffffff, rgba(0,0,0,0)),
+                radial-gradient(2px 2px at 130px 80px, #ffffff, rgba(0,0,0,0)),
+                radial-gradient(2px 2px at 160px 120px, #ffffff, rgba(0,0,0,0));
+            background-repeat: repeat;
+            background-size: 200px 200px;
+            opacity: 0.3;
+            animation: twinkle 5s infinite alternate;
+            z-index: 0;
+        }
+
+        /* 2. ANIMATIONS */
+        @keyframes hop {
+            0%, 100% { transform: translateY(0) scale(1); }
+            50% { transform: translateY(-25px) scale(1.05); }
+        }
+        @keyframes fall {
+            0% { transform: translateY(-10vh) rotate(0deg) scale(1); opacity: 1; }
+            100% { transform: translateY(110vh) rotate(720deg) scale(0.8); opacity: 0; }
+        }
+        @keyframes fadeInUp {
+            from { transform: translateY(20px); opacity: 0; filter: blur(5px); }
+            to { transform: translateY(0); opacity: 1; filter: blur(0); }
+        }
+        @keyframes twinkle {
+            from { opacity: 0.2; }
+            to { opacity: 0.5; }
+        }
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            25% { transform: translateX(-8px); }
+            50% { transform: translateX(8px); }
+            75% { transform: translateX(-8px); }
+        }
+        @keyframes cursorBlink {
+            0%, 100% { border-color: transparent; }
+            50% { border-color: #ec4899; }
+        }
+
+        /* Background Animals */
+        .bg-animal { 
+            position: absolute; 
+            z-index: 1; 
+            font-size: 4rem; 
+            pointer-events: none; 
+            filter: drop-shadow(0 10px 15px rgba(0,0,0,0.5)); 
+        }
+        .owl-anim { bottom: 10%; right: 8%; animation: hop 3s ease-in-out infinite; animation-delay: 0.5s; } 
+        .rabbit-anim { bottom: 10%; left: 8%; animation: hop 3s ease-in-out infinite; }
+        
+        .cat-anim { bottom: 20%; right: -30%; transition: all 0.8s cubic-bezier(0.34, 1.56, 0.64, 1); font-size: 5rem; opacity: 0; }
+        .cat-invade { right: 50%; transform: scale(3) translateX(50%) rotate(-10deg); z-index: 999; opacity: 1; filter: drop-shadow(0 0 30px rgba(239, 68, 68, 0.6)); }
+
+        /* 3. PREMIUM GLASSMORPHISM UI */
+        .glass-container {
+            background: rgba(30, 41, 59, 0.4);
+            backdrop-filter: blur(25px);
+            -webkit-backdrop-filter: blur(25px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-top: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 32px;
+            box-shadow: 0 30px 60px -12px rgba(0, 0, 0, 0.8), inset 0 0 20px rgba(255,255,255,0.05);
+            width: 90%;
+            max-width: 420px;
+            height: 85vh;
+            max-height: 800px;
+            padding: 2.5rem 2rem;
+            position: relative;
+            z-index: 10;
+            display: flex;
+            flex-direction: column;
+            overflow-x: hidden;
+            overflow-y: auto;
+        }
+        
+        /* Custom Scrollbar */
+        .glass-container::-webkit-scrollbar { width: 6px; }
+        .glass-container::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.2); border-radius: 10px; }
+
+        /* 4. PROGRESS BAR */
+        .progress-bar-bg { width: 100%; height: 6px; background: rgba(255,255,255,0.05); border-radius: 12px; margin-bottom: 30px; box-shadow: inset 0 1px 3px rgba(0,0,0,0.3); }
+        .progress-fill { height: 100%; background: linear-gradient(90deg, #ec4899, #8b5cf6, #3b82f6); background-size: 200% 200%; width: 0%; border-radius: 12px; transition: width 0.6s cubic-bezier(0.34, 1.56, 0.64, 1); box-shadow: 0 0 10px rgba(236, 72, 153, 0.5); }
+
+        /* 5. SCREENS & TYPOGRAPHY */
+        .screen { display: none; flex-direction: column; flex: 1; justify-content: center; text-align: center; }
+        .screen.active { display: flex; animation: fadeInUp 0.6s ease-out forwards; }
+        
+        h1 { font-size: 2rem; font-weight: 700; margin-bottom: 1rem; background: linear-gradient(135deg, #f8fafc, #a5b4fc); -webkit-background-clip: text; -webkit-text-fill-color: transparent; letter-spacing: -0.5px; }
+        h2 { font-size: 1.4rem; font-weight: 600; margin-top: 1.5rem; color: #fdf2f8; line-height: 1.4; }
+        p { font-size: 1.05rem; line-height: 1.6; margin-bottom: 1.5rem; color: #cbd5e1; }
+        
+        .mission-stat { display: flex; align-items: center; justify-content: flex-start; gap: 10px; background: rgba(255,255,255,0.05); padding: 12px 15px; border-radius: 12px; font-weight: 600; color: #f472b6; margin-bottom: 10px; font-size: 1.05rem; border: 1px solid rgba(255,255,255,0.05); }
+
+        /* 6. BUTTONS */
+        .btn {
+            background: rgba(255, 255, 255, 0.08);
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            padding: 16px 20px;
+            border-radius: 16px;
+            color: white;
+            font-size: 1.05rem;
+            font-weight: 600;
+            margin-bottom: 14px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            width: 100%;
+            -webkit-tap-highlight-color: transparent;
+            backdrop-filter: blur(10px);
+            position: relative;
+            overflow: hidden;
+        }
+        .btn:hover { background: rgba(255, 255, 255, 0.15); transform: translateY(-2px); box-shadow: 0 5px 15px rgba(0,0,0,0.2); }
+        .btn:active { transform: scale(0.97); }
+        .btn.disabled { pointer-events: none; opacity: 0.8; }
+        .btn-correct { background: rgba(34, 197, 94, 0.2) !important; border-color: rgba(34, 197, 94, 0.5) !important; color: #4ade80; box-shadow: 0 0 20px rgba(34, 197, 94, 0.2); }
+        .btn-wrong { background: rgba(239, 68, 68, 0.2) !important; border-color: rgba(239, 68, 68, 0.5) !important; animation: shake 0.4s ease; color: #f87171; }
+        
+        .btn-primary { background: linear-gradient(135deg, #ec4899, #8b5cf6); border: none; box-shadow: 0 10px 20px -5px rgba(236, 72, 153, 0.4); }
+        .btn-primary:hover { box-shadow: 0 15px 25px -5px rgba(236, 72, 153, 0.6); }
+
+        /* 7. SPECIAL ELEMENTS */
+        .typewriter { text-align: left; min-height: 320px; font-size: 1.05rem; color: #e2e8f0; padding-left: 15px; margin-bottom: 20px; border-left: 3px solid #ec4899; animation: cursorBlink 1s infinite; line-height: 1.7; }
+        .swipe-hint { font-size: 0.9rem; opacity: 0.6; margin-top: auto; padding-top: 20px; animation: hop 2s infinite; color: #94a3b8; font-weight: 300; }
+        
+        /* The No Button Container */
+        .btn-no-container { position: relative; height: 60px; width: 100%; margin-bottom: 14px; }
+        #btn-no { position: absolute; left: 0; top: 0; transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275); background: rgba(239, 68, 68, 0.15); border-color: rgba(239, 68, 68, 0.3); color: #fca5a5; }
+        
+        .notice { font-size: 0.9rem; color: #fbbf24; background: rgba(251, 191, 36, 0.1); padding: 12px; border-radius: 12px; border: 1px dashed rgba(251, 191, 36, 0.4); margin-bottom: 20px; text-align: left; display: flex; gap: 10px; align-items: flex-start; }
+
+        /* Achievement Toast */
+        .achievement {
+            position: fixed;
+            top: 40px;
+            left: 50%;
+            transform: translateX(-50%) translateY(-150px);
+            background: rgba(15, 23, 42, 0.95);
+            backdrop-filter: blur(10px);
+            color: #4ade80;
+            padding: 14px 28px;
+            border-radius: 50px;
+            font-weight: 600;
+            z-index: 1000;
+            transition: transform 0.5s cubic-bezier(0.34, 1.56, 0.64, 1);
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            border: 1px solid rgba(74, 222, 128, 0.3);
+            box-shadow: 0 20px 40px -5px rgba(0, 0, 0, 0.5), 0 0 20px rgba(74, 222, 128, 0.2);
+        }
+        .achievement.show { transform: translateX(-50%) translateY(0); }
+
+        /* Confetti */
+        .confetti { position: absolute; top: -10vh; z-index: 9999; font-size: 2rem; pointer-events: none; }
+    </style>
 </head>
 <body>
-<canvas id="confetti"></canvas>
 
-<div class="sticker" style="left:5%">🐱</div>
-<div class="sticker" style="left:25%">🦉</div>
-<div class="sticker" style="left:50%">🐰</div>
-<div class="sticker" style="left:75%">🐱</div>
+    <div class="bg-animal owl-anim">🦉</div>
+    <div class="bg-animal rabbit-anim">🐰</div>
+    <div class="bg-animal cat-anim" id="cat-invader">🐱</div>
 
-<div class="page active" id="p1"><div class="card">
-<h1>🦉 Welcome Rabbit!</h1>
-<p>Welcome to Owl's Secret Surprise Headquarters. To reveal the surprise, you must pass 3 friendship verification challenges.</p>
-<p>⚠ Wrong answers may cause emotional damage to Owl.</p>
-<button onclick="showPage(2)">Let's Start 🚀</button>
-</div></div>
+    <div class="achievement" id="achievement-toast">🏆 <span id="achieve-text">Verification Success!</span></div>
 
-<div class="page" id="p2"><div class="card">
-<h1>Question 1</h1>
-<p>When is Owl & Rabbit Bestie Anniversary?</p>
-<div class="answers">
-<button onclick="wrong()">02-02-2025</button>
-<button onclick="wrong()">03-02-2025</button>
-<button onclick="wrong()">04-02-2025</button>
-<button onclick="showPage(3)">05-02-2025 ✅</button>
-</div></div></div>
+    <div class="glass-container" id="app-container">
+        <div class="progress-bar-bg"><div class="progress-fill" id="progress"></div></div>
 
-<div class="page" id="p3"><div class="card">
-<h1>Question 2</h1>
-<p>What does Owl like the most?</p>
-<div class="answers">
-<button onclick="wrong()">Pineapple</button>
-<button onclick="wrong()">Mutton Biryani</button>
-<button onclick="wrong()">Chicken Biryani</button>
-<button onclick="showPage(4)">Mangoes 🥭 ✅</button>
-</div></div></div>
+        <div class="screen active" id="screen-0">
+            <h1>Hey Rabbit 🐰!</h1>
+            <p>Welcome to the <strong>Owl Surprise!</strong> 🦉✨</p>
+            <p>To reveal the hidden surprise, you must pass 3 crucial friendship verification tests.</p>
+            <button class="btn btn-primary" style="margin-top: 20px;" onclick="nextScreen()">Initiate Protocol 🚀</button>
+            <div class="swipe-hint">👈 Or swipe left to start</div>
+        </div>
 
-<div class="page" id="p4"><div class="card">
-<h1>🐱 Friendship Analysis</h1>
-<p>Kindness: 100%</p>
-<p>Chaos: 95%</p>
-<p>Food Lover: 100%</p>
-<p>Bestie Power: ∞</p>
-<p>Cat Council Verdict: Certified Good Human™</p>
-<button onclick="showPage(5)">Continue</button>
-</div></div>
+        <div class="screen" id="screen-1">
+            <h1>Verification I</h1>
+            <p>When is the official Owl & Rabbit Bestie Anniversary?</p>
+            <button class="btn" onclick="checkAnswer(this, false)">02 - 02 - 2025</button>
+            <button class="btn" onclick="checkAnswer(this, false)">03 - 02 - 2025</button>
+            <button class="btn" onclick="checkAnswer(this, false)">04 - 02 - 2025</button>
+            <button class="btn" onclick="checkAnswer(this, true, 'Memory Core: Validated 🥂')">05 - 02 - 2025</button>
+        </div>
 
-<div class="page" id="p5"><div class="card">
-<h1>Question 3</h1>
-<p>What was the first movie Rabbit went with Owl?</p>
-<div class="answers">
-<button onclick="showPage(6)">From the World of John Wick: Ballerina ✅</button>
-<button onclick="wrong()">Wicked for Good</button>
-<button onclick="wrong()">Scream 7</button>
-<button onclick="wrong()">Mission Impossible</button>
-</div></div></div>
+        <div class="screen" id="screen-2">
+            <h1>Verification II</h1>
+            <p>Identify the primary preference of the Owl:</p>
+            <button class="btn" onclick="checkAnswer(this, false)">Pineapple</button>
+            <button class="btn" onclick="checkAnswer(this, false)">Mutton Biryani</button>
+            <button class="btn" onclick="checkAnswer(this, false)">Chicken Biryani</button>
+            <button class="btn" onclick="checkAnswer(this, true, 'Taste Profile: Synced 🥭')">Mangoes</button>
+        </div>
 
-<div class="page" id="p6"><div class="card">
-<h1>❤️ Message From Owl</h1>
-<p>Hey bestieee ❤️🥹</p>
-<p>Before revealing the surprise, there’s something I genuinely wanted to say.</p>
-<p>I know my Rabbit is probably still upset with Owl, and honestly, I completely understand why.</p>
-<p>One thing that keeps bothering me is that Owl always said he would protect Rabbit. But when everything happened, I couldn't protect you the way I wanted to, and that's something I still regret a lot.</p>
-<p>When I heard your name came up in the whole situation, I honestly felt really bad. It was never supposed to involve you, and I never expected things to go in that direction.</p>
-<p>No matter how much I joke around, I genuinely value our friendship and I never wanted any negativity to reach you.</p>
-<p>So from Owl to Rabbit...❤️</p>
-<button onclick="showPage(7)">Continue 🥺</button>
-</div></div>
+        <div class="screen" id="screen-3">
+            <h1 style="background: #f87171; -webkit-background-clip: text;">⚠️ BREACH DETECTED</h1>
+            <p>External entity identified...</p>
+            <p style="font-size: 1.2rem;"><strong>A wild CAT 🐱 has invaded the interface!</strong></p>
+            <button class="btn btn-primary" style="margin-top: 30px; background: linear-gradient(135deg, #ef4444, #f97316);" onclick="shooCat()">Deploy Shoo-Mechanism! 🔫</button>
+        </div>
 
-<div class="page" id="p7"><div class="card">
-<h1>🦉 Bestie Date Proposal</h1>
-<p>I dare you to click NO 😏</p>
-<button onclick="showPage(8)">YES ❤️</button>
-<button id="noBtn">NO 😂</button>
-</div></div>
+        <div class="screen" id="screen-4">
+            <h1>Verification III</h1>
+            <p>Which cinematic experience did we share first?</p>
+            <button class="btn" onclick="checkAnswer(this, true, 'Cinematic Data: Perfect 🍿')">Ballerina (John Wick World)</button>
+            <button class="btn" onclick="checkAnswer(this, false)">Wicked for Good</button>
+            <button class="btn" onclick="checkAnswer(this, false)">Scream 7</button>
+            <button class="btn" onclick="checkAnswer(this, false)">Mission Impossible</button>
+        </div>
 
-<div class="page" id="p8"><div class="card">
-<h1>Choose Our Adventure</h1>
-<button onclick="showPage(9)">🍿 Movie</button>
-<button onclick="showPage(9)">🍕 Food</button>
-<button onclick="showPage(9)">🛍 Shopping</button>
-<button onclick="showPage(9)">☕ Cafe</button>
-</div></div>
+        <div class="screen" id="screen-5">
+            <h1>Decryption... 🥺</h1>
+            <div class="typewriter" id="typewriter-text"></div>
+            <button class="btn btn-primary" onclick="nextScreen()" style="margin-top: 10px; display: none;" id="apology-next">Accept & Continue ❤️</button>
+            <div class="swipe-hint" id="apology-swipe" style="display: none;">👈 Swipe left</div>
+        </div>
 
-<div class="page" id="p9"><div class="card">
-<h1>🎉 Surprise Unlocked 🎉</h1>
-<div class="gallery">
-<img src="owl.jpg" alt="owl">
-<img src="rabbit.jpg" alt="rabbit">
-<img src="bg1.jpg" alt="memory">
-</div>
-<p>Best Friend Status: VERIFIED ✅</p>
-<p>Rabbit Status: ADORABLE ✅</p>
-<p>Food Lover Status: VERIFIED ✅</p>
-<p>Movie Partner Status: VERIFIED ✅</p>
-<p>Life genuinely became more fun after Rabbit appeared in Owl's story.</p>
-<p>🦉 Owl appreciates Rabbit.</p>
-<p>Mission Complete ❤️</p>
-<button onclick="celebrate()">Finish 🎊</button>
-</div></div>
+        <div class="screen" id="screen-6">
+            <h1>Final Proposal</h1>
+            <p>Will you join Owl for a Bestie Date? 🥺💖</p>
+            <p style="font-size: 0.85rem; color: #f472b6; margin-bottom: 25px;">(Warning: NO button is highly unstable)</p>
+            
+            <button class="btn btn-primary" onclick="nextScreen(); showAchievement('Invitation Accepted! 🎉');">YES, OF COURSE! 🥰</button>
+            
+            <div class="btn-no-container">
+                <button class="btn" id="btn-no">NO 😒</button>
+            </div>
+        </div>
 
-<script>
-function showPage(n){
-document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
-document.getElementById('p'+n).classList.add('active');
-}
-function wrong(){alert('🐱 Cat Council disapproves. Try again!');}
+        <div class="screen" id="screen-7">
+            <h1>Selection Menu</h1>
+            <p>Choose our primary objective:</p>
+            <div class="notice"><span>⚠️</span> <span>Important Notice: Choosing all four options is also acceptable.</span></div>
+            <button class="btn" onclick="setChoice('Movie 🎬')">Movie</button>
+            <button class="btn" onclick="setChoice('Food 🍕')">Food</button>
+            <button class="btn" onclick="setChoice('Shopping 🛍️')">Shopping</button>
+            <button class="btn" onclick="setChoice('Cafe ☕')">Cafe</button>
+            <button class="btn btn-primary" onclick="setChoice('ALL THE THINGS! 🥳')">ALL OF THEM!</button>
+        </div>
 
-const noBtn=document.getElementById('noBtn');
-noBtn.addEventListener('mouseover',()=>{
-noBtn.style.position='fixed';
-noBtn.style.left=Math.random()*(window.innerWidth-120)+'px';
-noBtn.style.top=Math.random()*(window.innerHeight-60)+'px';
-});
+        <div class="screen" id="screen-8">
+            <h1>🦉 Mission Complete 🐰</h1>
+            <div style="text-align: left; margin: 15px 0; background: rgba(0,0,0,0.2); padding: 20px; border-radius: 20px;">
+                <p style="margin-bottom: 20px;">Rabbit successfully passed all friendship verification tests.</p>
+                <div class="mission-stat">✅ <span>Bestie Status: Confirmed</span></div>
+                <div class="mission-stat">✅ <span>Food Expert: Confirmed</span></div>
+                <div class="mission-stat">✅ <span>Movie Partner: Confirmed</span></div>
+                
+                <p style="margin-top: 25px; border-left: 3px solid #8b5cf6; padding-left: 10px;">
+                    <strong>Drama Queen:</strong> Why you won't do 😭 you will do right from today?
+                </p>
+                
+                <div class="mission-stat" style="color: #fb7185; border-color: rgba(251, 113, 133, 0.2); background: rgba(251, 113, 133, 0.05); margin-top: 20px;">
+                    🔥 Chaos Level: Extremely High
+                </div>
+            </div>
+            
+            <h2 style="font-size: 1.15rem; color: #a5b4fc;">See you on our Bestie Date! 🍿☕🍕<br><span style="font-size: 0.9rem; font-weight: 400; color:#e2e8f0;">(Rabbit, Gorgeousaurus, Princess)</span></h2>
+            
+            <button class="btn btn-primary" style="margin-top: 25px;" onclick="triggerConfetti()">Celebrate! ✨</button>
+        </div>
+    </div>
 
-function celebrate(){
-alert('🐰🦉 Thank you Rabbit!');
-const c=document.getElementById('confetti');
-const ctx=c.getContext('2d');
-c.width=innerWidth;c.height=innerHeight;
-let p=[...Array(120)].map(()=>({x:Math.random()*c.width,y:0,r:10+Math.random()*15,e:['🐰','🦉','🐱','❤️','✨'][Math.floor(Math.random()*5)]}));
-(function a(){
-ctx.clearRect(0,0,c.width,c.height);
-ctx.font='24px serif';
-p.forEach(o=>{o.y+=3;ctx.fillText(o.e,o.x,o.y)});
-requestAnimationFrame(a);
-})();
-}
-</script>
+    <script>
+        let currentScreen = 0;
+        const totalScreens = 8; 
+        const screens = document.querySelectorAll('.screen');
+        const progressBar = document.getElementById('progress');
+        let chosenActivity = "";
+        let isTransitioning = false; // Prevents double clicking
+        
+        // --- Swipe Handling ---
+        let touchStartX = 0;
+        let touchEndX = 0;
+        document.getElementById('app-container').addEventListener('touchstart', e => touchStartX = e.changedTouches[0].screenX);
+        document.getElementById('app-container').addEventListener('touchend', e => {
+            touchEndX = e.changedTouches[0].screenX;
+            if (touchStartX - touchEndX > 60) handleSwipeLeft();
+        });
+
+        function handleSwipeLeft() {
+            const blocked = [1, 2, 4, 6, 7]; // Screens requiring specific button clicks
+            if (blocked.includes(currentScreen) || isTransitioning) return;
+            if (currentScreen === 5 && document.getElementById('apology-next').style.display === 'none') return;
+            nextScreen();
+        }
+
+        function updateProgress() {
+            progressBar.style.width = ((currentScreen / totalScreens) * 100) + '%';
+        }
+
+        function nextScreen() {
+            if (currentScreen >= totalScreens || isTransitioning) return;
+            isTransitioning = true;
+            
+            screens[currentScreen].classList.remove('active');
+            currentScreen++;
+            screens[currentScreen].classList.add('active');
+            updateProgress();
+
+            // Screen Specific Triggers
+            if (currentScreen === 3) setTimeout(() => document.getElementById('cat-invader').classList.add('cat-invade'), 100);
+            if (currentScreen === 5) startTypewriter();
+            if (currentScreen === 8) setTimeout(triggerConfetti, 500);
+
+            setTimeout(() => isTransitioning = false, 600); // Unlock after animation
+        }
+
+        function checkAnswer(btn, isCorrect, achv) {
+            if (isTransitioning) return;
+            
+            // Lock all buttons on this screen temporarily
+            const allBtns = btn.parentElement.querySelectorAll('.btn');
+            allBtns.forEach(b => b.classList.add('disabled'));
+
+            if (isCorrect) {
+                btn.classList.add('btn-correct');
+                showAchievement(achv);
+                setTimeout(() => {
+                    allBtns.forEach(b => b.classList.remove('disabled'));
+                    nextScreen();
+                }, 1000);
+            } else {
+                btn.classList.add('btn-wrong');
+                setTimeout(() => {
+                    btn.classList.remove('btn-wrong');
+                    allBtns.forEach(b => b.classList.remove('disabled'));
+                }, 500);
+            }
+        }
+
+        function showAchievement(text) {
+            const toast = document.getElementById('achievement-toast');
+            document.getElementById('achieve-text').innerText = text;
+            toast.classList.add('show');
+            setTimeout(() => toast.classList.remove('show'), 3500);
+        }
+
+        function shooCat() {
+            if(isTransitioning) return;
+            document.getElementById('cat-invader').classList.remove('cat-invade');
+            showAchievement('Threat Neutralized! 🦸‍♀️');
+            setTimeout(nextScreen, 600);
+        }
+
+        function setChoice(choice) {
+            if(isTransitioning) return;
+            chosenActivity = choice;
+            showAchievement(choice + ' Selected!');
+            setTimeout(nextScreen, 800);
+        }
+
+        // --- Typewriter Effect ---
+        const apologyText = "Hey bestieee ❤️🥹\n\nI know you're rightfully angry with me right now. I always told you I would protect you, and it breaks my heart that I couldn't this time—I regret it so much.\n\nWhen your name got dragged into that whole situation, I felt terrible 😕. I never expected things to go in that direction, and it felt so wrong because it was never meant to involve you.\n\nI just had to say this: I never wanted any of that drama to reach you or for your name to come up in something that wasn't even about you 🥲.\n\nI am truly sorry.";
+        
+        function startTypewriter() {
+            let i = 0;
+            const target = document.getElementById('typewriter-text');
+            target.innerHTML = '';
+            
+            function type() {
+                if (i < apologyText.length) {
+                    let char = apologyText.charAt(i);
+                    target.innerHTML += (char === '\n') ? '<br><br>' : char; // Better paragraph spacing
+                    i++;
+                    setTimeout(type, 30); // Speed of typing
+                } else {
+                    document.getElementById('apology-next').style.display = 'block';
+                    document.getElementById('apology-swipe').style.display = 'block';
+                    target.style.animation = 'none'; // stop blinking border when done
+                }
+            }
+            setTimeout(type, 500); // Slight delay before typing starts
+        }
+
+        // --- Evasive "NO" Button ---
+        const btnNo = document.getElementById('btn-no');
+        function moveButton() {
+            // Translate the button within a safe radius so it doesn't break out of the container
+            const maxMoveX = 120; 
+            const maxMoveY = -150; 
+            
+            const randomX = (Math.random() - 0.5) * maxMoveX * 2;
+            const randomY = Math.random() * maxMoveY; // Mostly moves upwards to stay visible
+            
+            btnNo.style.transform = `translate(${randomX}px, ${randomY}px)`;
+        }
+        
+        btnNo.addEventListener('mouseover', moveButton);
+        btnNo.addEventListener('touchstart', (e) => { e.preventDefault(); moveButton(); }, {passive: false});
+
+        // --- Premium Confetti Engine ---
+        function triggerConfetti() {
+            const emojis = ['🎉', '❤️', '✨', '🦉', '🐰', '💖', '🍿', '🍕', '🥭'];
+            for (let j = 0; j < 70; j++) {
+                let conf = document.createElement('div');
+                conf.classList.add('confetti');
+                conf.innerText = emojis[Math.floor(Math.random() * emojis.length)];
+                
+                // Random starting positions
+                conf.style.left = Math.random() * 100 + 'vw';
+                
+                // Varied falling speeds and curves
+                const duration = Math.random() * 3 + 2;
+                conf.style.animation = `fall ${duration}s cubic-bezier(0.25, 0.46, 0.45, 0.94) forwards`;
+                conf.style.animationDelay = Math.random() * 1.5 + 's';
+                
+                // Varied sizes
+                conf.style.fontSize = (Math.random() * 1.5 + 1) + 'rem';
+                
+                document.body.appendChild(conf);
+                setTimeout(() => conf.remove(), (duration + 2) * 1000);
+            }
+        }
+    </script>
 </body>
 </html>
