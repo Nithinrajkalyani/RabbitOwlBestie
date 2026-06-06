@@ -6,24 +6,12 @@
     <title>Owl & Rabbit: Surprise HQ</title>
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
     <style>
-        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Poppins', sans-serif; }
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Poppins', sans-serif; -webkit-tap-highlight-color: transparent; }
         body { 
             background: linear-gradient(135deg, #0f172a, #1e293b); 
             height: 100vh; width: 100vw; overflow: hidden; color: #f8fafc;
             display: flex; justify-content: center; align-items: center;
         }
-
-        /* Animals behind the glass */
-        .bg-animal { 
-            position: absolute; z-index: 1; font-size: 3.5rem; 
-            pointer-events: none; opacity: 0.25; filter: blur(3px);
-        }
-        @keyframes hop { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-30px); } }
-        .owl-anim { bottom: 10%; right: 15%; animation: hop 2s ease-in-out infinite; animation-delay: 0.5s; } 
-        .rabbit-anim { bottom: 10%; left: 15%; animation: hop 2s ease-in-out infinite; }
-        
-        .cat-anim { bottom: 20%; right: -25%; transition: all 0.6s ease; font-size: 2.5rem; }
-        .cat-invade { right: 50%; transform: scale(2) translateX(50%); z-index: 999; opacity: 1; filter: blur(0); }
 
         .glass-container {
             background: rgba(255, 255, 255, 0.08);
@@ -31,48 +19,58 @@
             border: 1px solid rgba(255, 255, 255, 0.15);
             border-radius: 32px; width: 92%; max-width: 420px; height: 82vh;
             padding: 2.5rem 1.8rem; position: relative; z-index: 10;
-            display: flex; flex-direction: column; overflow-y: auto;
+            display: flex; flex-direction: column; overflow: hidden;
         }
 
-        .progress-bar-bg { width: 100%; height: 8px; background: rgba(255,255,255,0.1); border-radius: 12px; margin-bottom: 25px; }
+        /* Animals INSIDE the glass container */
+        .inner-animal { position: absolute; bottom: 5%; font-size: 3rem; z-index: 15; opacity: 0.7; pointer-events: none; }
+        @keyframes hop { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-20px); } }
+        .owl-inner { right: 10%; animation: hop 2.5s ease-in-out infinite; } 
+        .rabbit-inner { left: 10%; animation: hop 2.5s ease-in-out infinite; }
+        
+        .cat-anim { position: absolute; bottom: 15%; right: -25%; transition: all 0.6s ease; font-size: 2.5rem; z-index: 20; pointer-events: none; }
+        .cat-invade { right: 40%; transform: scale(2); z-index: 20; }
+
+        /* Confetti zoned inside the glass layout */
+        .confetti-zone { position: absolute; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; z-index: 5; }
+
+        .progress-bar-bg { width: 100%; height: 8px; background: rgba(255,255,255,0.1); border-radius: 12px; margin-bottom: 25px; z-index: 21; }
         .progress-fill { height: 100%; background: linear-gradient(90deg, #ec4899, #8b5cf6); width: 0%; transition: width 0.5s; }
 
-        .screen { display: none; flex-direction: column; flex: 1; justify-content: center; text-align: center; }
+        .screen { display: none; flex-direction: column; flex: 1; justify-content: center; text-align: center; z-index: 25; }
         .screen.active { display: flex; }
         
         h1 { font-size: 1.6rem; color: #fff; margin-bottom: 1rem; }
-        .btn { background: rgba(255, 255, 255, 0.1); border: 1px solid rgba(255, 255, 255, 0.2); padding: 15px; border-radius: 16px; color: white; width: 100%; margin-bottom: 10px; cursor: pointer; transition: 0.3s; }
+        p { font-size: 1.05rem; line-height: 1.6; margin-bottom: 1.2rem; color: #cbd5e1; }
+        
+        .btn { background: rgba(255, 255, 255, 0.1); border: 1px solid rgba(255, 255, 255, 0.2); padding: 15px; border-radius: 16px; color: white; width: 100%; margin-bottom: 10px; cursor: pointer; transition: 0.3s; font-weight: 600; }
         .btn:active { background: rgba(255,255,255,0.2); }
         .btn-correct { background: rgba(34, 197, 94, 0.3) !important; }
 
         .achievement { position: fixed; top: 30px; left: 50%; transform: translateX(-50%) translateY(-150px); background: #0f172a; color: #4ade80; padding: 10px 20px; border-radius: 50px; transition: 0.5s; z-index: 2000; border: 1px solid #4ade80; }
         .achievement.show { transform: translateX(-50%) translateY(0); }
         
-        /* Confetti Falling Logic */
         @keyframes fall {
-            0% { transform: translateY(-10vh); opacity: 0; }
+            0% { transform: translateY(-5vh); opacity: 0; }
             20% { opacity: 1; }
-            100% { transform: translateY(85vh); }
+            100% { transform: translateY(75vh); }
         }
-        .falling-emoji {
-            position: absolute;
-            z-index: 5;
-            font-size: 1.5rem;
-            animation: fall 3s cubic-bezier(0.2, 0.8, 0.8, 1) forwards;
-        }
+        .falling-emoji { position: absolute; font-size: 1.5rem; animation: fall 3s linear forwards; }
+        .mission-stat { font-weight: 600; color: #f472b6; margin-bottom: 8px; font-size: 1.1rem; }
     </style>
 </head>
 <body>
 
-    <div class="bg-animal owl-anim">🦉</div>
-    <div class="bg-animal rabbit-anim">🐰</div>
-    <div class="bg-animal cat-anim" id="cat-invader">🐱</div>
     <div class="achievement" id="achievement-toast">🏆 <span id="achieve-text">Success!</span></div>
 
     <div class="glass-container" id="app-container">
+        <div class="inner-animal owl-inner">🦉</div>
+        <div class="inner-animal rabbit-inner">🐰</div>
+        <div class="cat-anim" id="cat-invader">🐱</div>
+        <div id="confetti-zone" class="confetti-zone"></div>
+
         <div class="progress-bar-bg"><div class="progress-fill" id="progress"></div></div>
 
-        <!-- Start -->
         <div class="screen active" id="screen-0">
             <h1>Welcome Rabbit! 🐰</h1>
             <p>Welcome to Owl's Secret Surprise Headquarters. To reveal the surprise, you must pass 3 friendship challenges.</p>
@@ -80,22 +78,21 @@
             <button class="btn" onclick="nextScreen()">Let's get started!</button>
         </div>
 
-        <!-- Questions -->
         <div class="screen" id="screen-1">
             <h1>Question 1</h1>
             <p>When is Owl & Rabbit bestie anniversary date?</p>
-            <button class="btn" onclick="checkAnswer(this, false)">02 - 02 - 2025</button>
-            <button class="btn" onclick="checkAnswer(this, false)">03 - 02 - 2025</button>
-            <button class="btn" onclick="checkAnswer(this, false)">04 - 02 - 2025</button>
+            <button class="btn" onclick="checkAnswer(this, false, 'Oops!')">02 - 02 - 2025</button>
+            <button class="btn" onclick="checkAnswer(this, false, 'Oops!')">03 - 02 - 2025</button>
+            <button class="btn" onclick="checkAnswer(this, false, 'Oops!')">04 - 02 - 2025</button>
             <button class="btn" onclick="checkAnswer(this, true, 'Correct!')">05 - 02 - 2025</button>
         </div>
 
         <div class="screen" id="screen-2">
             <h1>Question 2</h1>
             <p>What owl likes a lot?</p>
-            <button class="btn" onclick="checkAnswer(this, false)">Pineapple</button>
-            <button class="btn" onclick="checkAnswer(this, false)">Mutton biryani</button>
-            <button class="btn" onclick="checkAnswer(this, false)">Chicken biryani</button>
+            <button class="btn" onclick="checkAnswer(this, false, 'Oops!')">Pineapple</button>
+            <button class="btn" onclick="checkAnswer(this, false, 'Oops!')">Mutton biryani</button>
+            <button class="btn" onclick="checkAnswer(this, false, 'Oops!')">Chicken biryani</button>
             <button class="btn" onclick="checkAnswer(this, true, 'Correct!')">Mangoes</button>
         </div>
 
@@ -109,62 +106,49 @@
             <h1>Question 3</h1>
             <p>What is the first movie went with owl?</p>
             <button class="btn" onclick="checkAnswer(this, true, 'Correct!')">Ballerina (John Wick World)</button>
-            <button class="btn" onclick="checkAnswer(this, false)">Wicked for good</button>
-            <button class="btn" onclick="checkAnswer(this, false)">Scream 7</button>
-            <button class="btn" onclick="checkAnswer(this, false)">Mission Impossible</button>
+            <button class="btn" onclick="checkAnswer(this, false, 'Oops!')">Wicked for good</button>
+            <button class="btn" onclick="checkAnswer(this, false, 'Oops!')">Scream 7</button>
+            <button class="btn" onclick="checkAnswer(this, false, 'Oops!')">Mission Impossible</button>
         </div>
 
         <div class="screen" id="screen-5">
             <h1>I'm Sorry 🥺</h1>
-            <div id="typewriter-text" style="text-align:left; font-size:0.9rem; margin-bottom:15px;"></div>
+            <div id="typewriter-text" style="text-align:left; font-size:0.95rem; margin-bottom:15px; line-height:1.5;"></div>
             <button class="btn" id="apology-next" style="display:none;" onclick="nextScreen()">Forgive me? ❤️</button>
         </div>
 
         <div class="screen" id="screen-6">
             <h1>Bestie Date</h1>
             <p>Let's go for a bestie date? 🥺💖</p>
+            <div style="font-size:0.85rem; color:#ffd700; margin-bottom:10px;">(Before clicking yes I dare you click NO button lol)</div>
             <button class="btn" onclick="nextScreen()">YES! 🥰</button>
-            <button class="btn" id="btn-no" style="position:relative;">NO 😒</button>
+            <button class="btn" id="btn-no" style="position:relative; background: rgba(239, 68, 68, 0.2);">No</button>
         </div>
 
         <div class="screen" id="screen-7">
             <h1>Selection Menu</h1>
-            <div style="font-size:0.8rem; color:#fbbf24; margin-bottom:10px;">⚠️ Choosing all four is also acceptable!</div>
+            <div style="font-size:0.85rem; color:#fbbf24; margin-bottom:15px; padding: 5px; border: 1px dashed #fbbf24; border-radius: 8px;">⚠️ Choosing all four is also acceptable!</div>
             <button class="btn" onclick="nextScreen()">Movie</button>
             <button class="btn" onclick="nextScreen()">Food</button>
             <button class="btn" onclick="nextScreen()">Shopping</button>
             <button class="btn" onclick="nextScreen()">Cafe</button>
-            <button class="btn" style="background:#8b5cf6;" onclick="nextScreen()">ALL OF THEM!</button>
+            <button class="btn" style="background: linear-gradient(90deg, #ec4899, #8b5cf6);" onclick="nextScreen()">ALL OF THEM!</button>
         </div>
 
         <div class="screen" id="screen-8">
-
             <h1>🦉 Mission Complete 🐰</h1>
-
-            <div style="text-align: left; margin: 10px 0;">
-
+            <div style="text-align: left; margin: 10px 0; font-size: 0.95rem;">
                 <p>Rabbit successfully passed all friendship verification tests.</p>
-
                 <div class="mission-stat">✅ Bestie Status: Confirmed</div>
-
                 <div class="mission-stat">✅ Food Expert: Confirmed</div>
-
                 <div class="mission-stat">✅ Movie Partner: Confirmed</div>
-
-                <p><strong>Drama Queen:</strong> Why you won't do 😭 you will do right from today?</p>
-
+                <p style="margin: 10px 0;"><strong>Drama Queen:</strong> Why you won't do 😭 you will do right from today?</p>
                 <div class="mission-stat" style="color: #fb7185;">🔥 Chaos Level: Extremely High</div>
-
                 <p style="font-style: italic; margin-top: 15px;">Thank you for being part of Owl's journey ❤️</p>
-
             </div>
-
-            <h2>See you on our Bestie, Rabbit, Gorgeousaurus, Princess on bestie Date 🍿☕🍕</h2>
-
-            <button class="btn" style="margin-top: 20px;" onclick="triggerConfetti()">Celebrate! ✨</button>
-
+            <h2 style="font-size: 1.2rem; margin-top: 10px; color: #fdf2f8;">See you on our Bestie, Rabbit, Gorgeousaurus, Princess on bestie Date 🍿☕🍕</h2>
+            <button class="btn" style="margin-top: 15px; background: rgba(255,255,255,0.15);" onclick="spawnConfetti()">Celebrate Again! ✨</button>
         </div>
-
     </div>
 
     <script>
@@ -176,13 +160,27 @@
             currentScreen++;
             document.querySelectorAll('.screen')[currentScreen].classList.add('active');
             document.getElementById('progress').style.width = (currentScreen/totalScreens*100) + '%';
-            if(currentScreen === 3) document.getElementById('cat-invader').classList.add('cat-invade');
+            
+            if(currentScreen === 3) setTimeout(() => document.getElementById('cat-invader').classList.add('cat-invade'), 200);
             if(currentScreen === 5) startTypewriter();
             if(currentScreen === 8) spawnConfetti();
         }
 
         function checkAnswer(btn, isCorrect, msg) {
-            if(isCorrect) { btn.classList.add('btn-correct'); showAchievement(msg); setTimeout(nextScreen, 800); }
+            if(isCorrect) { 
+                btn.classList.add('btn-correct'); 
+                showAchievement(msg); 
+                setTimeout(nextScreen, 800); 
+            } else {
+                btn.style.background = 'rgba(239, 68, 68, 0.3)';
+                btn.animate([
+                    { transform: 'translateX(0)' },
+                    { transform: 'translateX(-8px)' },
+                    { transform: 'translateX(8px)' },
+                    { transform: 'translateX(0)' }
+                ], { duration: 150, iterations: 2 });
+                setTimeout(() => btn.style.background = 'rgba(255, 255, 255, 0.1)', 1000);
+            }
         }
 
         function showAchievement(text) {
@@ -192,34 +190,67 @@
             setTimeout(() => toast.classList.remove('show'), 2000);
         }
 
-        function shooCat() { document.getElementById('cat-invader').classList.remove('cat-invade'); nextScreen(); }
+        function shooCat() { 
+            document.getElementById('cat-invader').classList.remove('cat-invade'); 
+            showAchievement('Cat Escaped! 💨');
+            nextScreen(); 
+        }
 
         function startTypewriter() {
-            const text = "Hey bestieee ❤️🥹\nI know you're rightfully angry with me right now. I know owl said he will protect rabbit but i can't protect you still I regret a lot.\nI never wanted any of that drama to reach you or for your name to come up in something that wasn't even about you 🥲.\nI am truly sorry.";
+            const text = "Hey bestieee ❤️🥹\n\nI know my bestie is angry right at me. I know owl said he will protect rabbit but i can't protect you still I regret a lot\n\nJust wanted to say something . When I heard your name came up in the whole situation, I honestly felt very bad 😕. I never expected things to go in that direction, and it felt weird because it was never meant to involve you.\n\nI still wanted to say it. I never wanted any of that drama to reach you or for your name to come up because of something that wasn't even about you 🥲.";
             let i = 0;
+            const target = document.getElementById('typewriter-text');
+            target.innerHTML = '';
             function type() {
                 if(i < text.length) {
-                    document.getElementById('typewriter-text').innerHTML += text[i] === '\n' ? '<br>' : text[i];
-                    i++; setTimeout(type, 30);
-                } else document.getElementById('apology-next').style.display = 'block';
+                    target.innerHTML += text[i] === '\n' ? '<br>' : text[j = i];
+                    i++; setTimeout(type, 25);
+                } else {
+                    document.getElementById('apology-next').style.display = 'block';
+                }
             }
             type();
         }
 
         function spawnConfetti() {
+            const zone = document.getElementById('confetti-zone');
             const emojis = ['🎉', '❤️', '✨', '🦉', '🐰', '💖', '🍿', '🍕'];
             for(let j=0; j<60; j++) {
                 let div = document.createElement('div');
                 div.className = 'falling-emoji';
                 div.innerText = emojis[Math.floor(Math.random()*emojis.length)];
-                div.style.left = Math.random()*100 + 'vw';
+                div.style.left = Math.random()*90 + '%';
                 div.style.animationDelay = Math.random()*2 + 's';
-                document.body.appendChild(div);
+                zone.appendChild(div);
             }
         }
 
+        // Hyperactive erratic moving mechanism for the NO button inside the safe bounds
         const btnNo = document.getElementById('btn-no');
-        btnNo.onmouseover = () => { btnNo.style.position = 'absolute'; btnNo.style.left = Math.random()*70 + '%'; btnNo.style.top = Math.random()*70 + '%'; };
+        const container = document.getElementById('app-container');
+        
+        function escapeTrigger(e) {
+            if(e) e.preventDefault();
+            const pad = 30;
+            const containerRect = container.getBoundingClientRect();
+            const btnRect = btnNo.getBoundingClientRect();
+            
+            const maxX = containerRect.width - btnRect.width - pad;
+            const maxY = containerRect.height - btnRect.height - pad;
+            
+            // Generate non-zero random coordinates cleanly bounded within the card wrapper
+            const targetX = Math.max(pad, Math.floor(Math.random() * maxX));
+            const targetY = Math.max(pad, Math.floor(Math.random() * maxY)) - (containerRect.height / 2.5);
+
+            btnNo.style.position = 'absolute';
+            btnNo.style.left = targetX + 'px';
+            btnNo.style.top = 'auto'; // Reset implicit flex positions
+            btnNo.style.transform = `translateY(${targetY}px)`;
+        }
+
+        btnNo.addEventListener('mouseenter', escapeTrigger);
+        btnNo.addEventListener('pointerenter', escapeTrigger);
+        btnNo.addEventListener('touchstart', escapeTrigger);
     </script>
 </body>
 </html>
